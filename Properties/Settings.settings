@@ -1,0 +1,39 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="WinGrooves.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="trayMinimize" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="hotkeyPlay" Type="System.UInt32" Scope="User">
+      <Value Profile="(Default)">393252</Value>
+    </Setting>
+    <Setting Name="hotkeyNext" Type="System.UInt32" Scope="User">
+      <Value Profile="(Default)">393255</Value>
+    </Setting>
+    <Setting Name="hotkeyPrevious" Type="System.UInt32" Scope="User">
+      <Value Profile="(Default)">393253</Value>
+    </Setting>
+    <Setting Name="hotkeyFavorite" Type="System.UInt32" Scope="User">
+      <Value Profile="(Default)">393322</Value>
+    </Setting>
+    <Setting Name="hotkeyDislike" Type="System.UInt32" Scope="User">
+      <Value Profile="(Default)">393325</Value>
+    </Setting>
+    <Setting Name="hotkeyLike" Type="System.UInt32" Scope="User">
+      <Value Profile="(Default)">393323</Value>
+    </Setting>
+    <Setting Name="hotkeyShowHide" Type="System.UInt32" Scope="User">
+      <Value Profile="(Default)">393261</Value>
+    </Setting>
+    <Setting Name="hotkeyMute" Type="System.UInt32" Scope="User">
+      <Value Profile="(Default)">393293</Value>
+    </Setting>
+    <Setting Name="hotkeyShuffle" Type="System.UInt32" Scope="User">
+      <Value Profile="(Default)">393299</Value>
+    </Setting>
+    <Setting Name="startMinimized" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>
