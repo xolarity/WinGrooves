@@ -9,14 +9,14 @@ using mshtml;
 
 namespace WinGrooves
 {
-	/// <summary>
-	/// Summary description for FrmMain.
-	/// </summary>
-	public class FrmMain : System.Windows.Forms.Form
+    /// <summary>
+    /// Summary description for FrmMain.
+    /// </summary>
+    public class FrmMain : System.Windows.Forms.Form
     {
         private WebBrowser webBrowser1;
-		private System.ComponentModel.IContainer components;
-		private bool injectedSongInfoFunctions = false;
+        private System.ComponentModel.IContainer components;
+        private bool injectedSongInfoFunctions = false;
         const int WM_HOTKEY = 0x0312;
         const int VK_MEDIA_NEXT_TRACK = 0xB0;
         const int VK_MEDIA_PREV_TRACK = 0xB1;
@@ -39,43 +39,43 @@ namespace WinGrooves
         private ToolStripButton toolStripButton1;
         private ToolStripButton toolStripButton2;
         private ToolStripButton toolStripButton3;
-		private Timer currentSongTimer;
-		private ToolStripButton toolStripButton4;
+        private Timer currentSongTimer;
+        private ToolStripButton toolStripButton4;
         private Timer alwaysListeningTimer;
         private ToolStripMenuItem Play;
 
-		public FrmMain()
-		{
-			//
-			// Required for Windows Form Designer support
-			//
-			InitializeComponent();
+        public FrmMain()
+        {
+            //
+            // Required for Windows Form Designer support
+            //
+            InitializeComponent();
             this.Resize += new EventHandler(FrmMain_Resize);
-		}
+        }
 
-		/// <summary>
-		/// Clean up any resources being used.
-		/// </summary>
-		protected override void Dispose( bool disposing )
-		{
-			if( disposing )
-			{
-				if (components != null) 
-				{
-					components.Dispose();
-				}
-			}
-			base.Dispose( disposing );
-		}
+        /// <summary>
+        /// Clean up any resources being used.
+        /// </summary>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (components != null)
+                {
+                    components.Dispose();
+                }
+            }
+            base.Dispose(disposing);
+        }
 
 
-		#region Windows Form Designer generated code
-		/// <summary>
-		/// Required method for Designer support - do not modify
-		/// the contents of this method with the code editor.
-		/// </summary>
-		private void InitializeComponent()
-		{
+        #region Windows Form Designer generated code
+        /// <summary>
+        /// Required method for Designer support - do not modify
+        /// the contents of this method with the code editor.
+        /// </summary>
+        private void InitializeComponent()
+        {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FrmMain));
             this.webBrowser1 = new System.Windows.Forms.WebBrowser();
@@ -108,7 +108,7 @@ namespace WinGrooves
             this.webBrowser1.MinimumSize = new System.Drawing.Size(20, 20);
             this.webBrowser1.Name = "webBrowser1";
             this.webBrowser1.ScriptErrorsSuppressed = true;
-            this.webBrowser1.Size = new System.Drawing.Size(1517, 690);
+            this.webBrowser1.Size = new System.Drawing.Size(1008, 537);
             this.webBrowser1.TabIndex = 9;
             this.webBrowser1.Url = new System.Uri("", System.UriKind.Relative);
             this.webBrowser1.DocumentCompleted += new System.Windows.Forms.WebBrowserDocumentCompletedEventHandler(this.webBrowser1_DocumentCompleted);
@@ -205,7 +205,7 @@ namespace WinGrooves
             this.toolStripButton4});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(1517, 25);
+            this.toolStrip1.Size = new System.Drawing.Size(1008, 25);
             this.toolStrip1.TabIndex = 10;
             this.toolStrip1.Text = "toolStrip1";
             // 
@@ -263,7 +263,7 @@ namespace WinGrooves
             // 
             this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
             this.CausesValidation = false;
-            this.ClientSize = new System.Drawing.Size(1517, 715);
+            this.ClientSize = new System.Drawing.Size(1008, 562);
             this.Controls.Add(this.webBrowser1);
             this.Controls.Add(this.toolStrip1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -278,15 +278,15 @@ namespace WinGrooves
             this.ResumeLayout(false);
             this.PerformLayout();
 
-		}
-		#endregion
-	
-		/// <summary>
-		/// The main entry point for the application.
-		/// </summary>
-		[STAThread]
-		static void Main() 
-		{
+        }
+        #endregion
+
+        /// <summary>
+        /// The main entry point for the application.
+        /// </summary>
+        [STAThread]
+        static void Main()
+        {
             //Check if application is aready running before running it again
             bool ok;
             object m = new System.Threading.Mutex(true, "WinGrooves", out ok);
@@ -295,21 +295,22 @@ namespace WinGrooves
                 MessageBox.Show("WinGrooves is already running.");
                 return;
             }
-			Application.Run(new FrmMain());
+            Application.Run(new FrmMain());
             GC.KeepAlive(m);
-		}
+        }
 
-		private void FrmMain_Load(object sender, System.EventArgs e)
-		{
+        private void FrmMain_Load(object sender, System.EventArgs e)
+        {
             webBrowser1.Navigate("http://listen.grooveshark.com");
-			// register the event that is fired after a key press.
-			hook.KeyPressed += new EventHandler<KeyPressedEventArgs>(hook_KeyPressed);
+            // register the event that is fired after a key press.
+            hook.KeyPressed += new EventHandler<KeyPressedEventArgs>(hook_KeyPressed);
             webBrowser1.ObjectForScripting = this; //needed to capture JavaScript events
 
-            if (Properties.Settings.Default.startMinimized){
+            if (Properties.Settings.Default.startMinimized)
+            {
                 showHideWindow();
             }
-		}
+        }
 
         /*
          * Simulates a browser click on an html element
@@ -320,19 +321,19 @@ namespace WinGrooves
             webBrowser1.Document.GetElementById(action).InvokeMember("click");
         }
 
-		/*
-		 * Injects some jQuery to select and click on specific elements
-		 /// <param name="action">the jquery selector for the element to click on ("#elementid .childclass")</param>
-		 * */
-		private void htmlClickOn(string selector)
-		{
-			if (webBrowser1.ReadyState == WebBrowserReadyState.Complete)
-			{
+        /*
+         * Injects some jQuery to select and click on specific elements
+         /// <param name="action">the jquery selector for the element to click on ("#elementid .childclass")</param>
+         * */
+        private void htmlClickOn(string selector)
+        {
+            if (webBrowser1.ReadyState == WebBrowserReadyState.Complete)
+            {
                 Object[] objArray = new Object[1];
                 objArray[0] = (Object)selector;
                 webBrowser1.Document.InvokeScript("clickElement", objArray);
-			}
-		}
+            }
+        }
 
         private void notifyIcon1_MouseDoubleClick(object sender, MouseEventArgs e)
         {
@@ -353,7 +354,7 @@ namespace WinGrooves
 
         private void FrmMain_Activated(object sender, EventArgs e)
         {
-			SetupGlobalHotkeys();
+            SetupGlobalHotkeys();
         }
 
         private void Exit_Click(object sender, EventArgs e)
@@ -364,25 +365,25 @@ namespace WinGrooves
 
         private void HideShow_Click(object sender, EventArgs e)
         {
-			showHideWindow();
+            showHideWindow();
         }
 
-		private void showHideWindow()
-		{
-			if (this.WindowState == FormWindowState.Minimized)
-			{
-				Show();
-				WindowState = FormWindowState.Normal;
-			}
-			else
-			{
-				this.WindowState = FormWindowState.Minimized;
-				if (Properties.Settings.Default.trayMinimize)
-				{
-					Hide();
-				}
-			}
-		}
+        private void showHideWindow()
+        {
+            if (this.WindowState == FormWindowState.Minimized)
+            {
+                Show();
+                WindowState = FormWindowState.Normal;
+            }
+            else
+            {
+                this.WindowState = FormWindowState.Minimized;
+                if (Properties.Settings.Default.trayMinimize)
+                {
+                    Hide();
+                }
+            }
+        }
 
         private void Play_Click(object sender, EventArgs e)
         {
@@ -401,36 +402,36 @@ namespace WinGrooves
 
         private void SetupGlobalHotkeys()
         {
-			hook.unregisterAllHotkeys(); //first unregister everything
+            hook.unregisterAllHotkeys(); //first unregister everything
 
-			// register the media keys
-			try { hook.RegisterHotKey(global::ModifierKeys.None, (Keys)VK_MEDIA_PLAY_PAUSE); }
-			catch (InvalidOperationException exception) { } //MessageBox.Show(exception.Message);
-			try { hook.RegisterHotKey(global::ModifierKeys.None, (Keys)VK_MEDIA_NEXT_TRACK); }
-			catch (InvalidOperationException exception) {  }
-			try { hook.RegisterHotKey(global::ModifierKeys.None, (Keys)VK_MEDIA_PREV_TRACK); }
-			catch (InvalidOperationException exception) {  }
+            // register the media keys
+            try { hook.RegisterHotKey(global::ModifierKeys.None, (Keys)VK_MEDIA_PLAY_PAUSE); }
+            catch (InvalidOperationException exception) { } //MessageBox.Show(exception.Message);
+            try { hook.RegisterHotKey(global::ModifierKeys.None, (Keys)VK_MEDIA_NEXT_TRACK); }
+            catch (InvalidOperationException exception) { }
+            try { hook.RegisterHotKey(global::ModifierKeys.None, (Keys)VK_MEDIA_PREV_TRACK); }
+            catch (InvalidOperationException exception) { }
 
             //register other customizable hot keys
-			try { hook.RegisterHotKey(hook.Win32ModifiersFromKeys((Keys)Properties.Settings.Default.hotkeyPlay), hook.getKeyWithoutModifier((Keys)Properties.Settings.Default.hotkeyPlay)); }
-			catch (InvalidOperationException exception) {  }
-			try { hook.RegisterHotKey(hook.Win32ModifiersFromKeys((Keys)Properties.Settings.Default.hotkeyNext), hook.getKeyWithoutModifier((Keys)Properties.Settings.Default.hotkeyNext)); }
-			catch (InvalidOperationException exception) {  }
-			try { hook.RegisterHotKey(hook.Win32ModifiersFromKeys((Keys)Properties.Settings.Default.hotkeyPrevious), hook.getKeyWithoutModifier((Keys)Properties.Settings.Default.hotkeyPrevious)); }
-			catch (InvalidOperationException exception) {  }
-			try { hook.RegisterHotKey(hook.Win32ModifiersFromKeys((Keys)Properties.Settings.Default.hotkeyLike), hook.getKeyWithoutModifier((Keys)Properties.Settings.Default.hotkeyLike)); }
-			catch (InvalidOperationException exception) {  }
-			try { hook.RegisterHotKey(hook.Win32ModifiersFromKeys((Keys)Properties.Settings.Default.hotkeyDislike), hook.getKeyWithoutModifier((Keys)Properties.Settings.Default.hotkeyDislike)); }
-			catch (InvalidOperationException exception) {  }
-			try { hook.RegisterHotKey(hook.Win32ModifiersFromKeys((Keys)Properties.Settings.Default.hotkeyFavorite), hook.getKeyWithoutModifier((Keys)Properties.Settings.Default.hotkeyFavorite)); }
-			catch (InvalidOperationException exception) {  }
-			try { hook.RegisterHotKey(hook.Win32ModifiersFromKeys((Keys)Properties.Settings.Default.hotkeyShowHide), hook.getKeyWithoutModifier((Keys)Properties.Settings.Default.hotkeyShowHide)); }
-			catch (InvalidOperationException exception) {  }
-			try { hook.RegisterHotKey(hook.Win32ModifiersFromKeys((Keys)Properties.Settings.Default.hotkeyMute), hook.getKeyWithoutModifier((Keys)Properties.Settings.Default.hotkeyMute)); }
-			catch (InvalidOperationException exception) {  }
-			try { hook.RegisterHotKey(hook.Win32ModifiersFromKeys((Keys)Properties.Settings.Default.hotkeyShuffle), hook.getKeyWithoutModifier((Keys)Properties.Settings.Default.hotkeyShuffle)); }
-			catch (InvalidOperationException exception) { }
-		}
+            try { hook.RegisterHotKey(hook.Win32ModifiersFromKeys((Keys)Properties.Settings.Default.hotkeyPlay), hook.getKeyWithoutModifier((Keys)Properties.Settings.Default.hotkeyPlay)); }
+            catch (InvalidOperationException exception) { }
+            try { hook.RegisterHotKey(hook.Win32ModifiersFromKeys((Keys)Properties.Settings.Default.hotkeyNext), hook.getKeyWithoutModifier((Keys)Properties.Settings.Default.hotkeyNext)); }
+            catch (InvalidOperationException exception) { }
+            try { hook.RegisterHotKey(hook.Win32ModifiersFromKeys((Keys)Properties.Settings.Default.hotkeyPrevious), hook.getKeyWithoutModifier((Keys)Properties.Settings.Default.hotkeyPrevious)); }
+            catch (InvalidOperationException exception) { }
+            try { hook.RegisterHotKey(hook.Win32ModifiersFromKeys((Keys)Properties.Settings.Default.hotkeyLike), hook.getKeyWithoutModifier((Keys)Properties.Settings.Default.hotkeyLike)); }
+            catch (InvalidOperationException exception) { }
+            try { hook.RegisterHotKey(hook.Win32ModifiersFromKeys((Keys)Properties.Settings.Default.hotkeyDislike), hook.getKeyWithoutModifier((Keys)Properties.Settings.Default.hotkeyDislike)); }
+            catch (InvalidOperationException exception) { }
+            try { hook.RegisterHotKey(hook.Win32ModifiersFromKeys((Keys)Properties.Settings.Default.hotkeyFavorite), hook.getKeyWithoutModifier((Keys)Properties.Settings.Default.hotkeyFavorite)); }
+            catch (InvalidOperationException exception) { }
+            try { hook.RegisterHotKey(hook.Win32ModifiersFromKeys((Keys)Properties.Settings.Default.hotkeyShowHide), hook.getKeyWithoutModifier((Keys)Properties.Settings.Default.hotkeyShowHide)); }
+            catch (InvalidOperationException exception) { }
+            try { hook.RegisterHotKey(hook.Win32ModifiersFromKeys((Keys)Properties.Settings.Default.hotkeyMute), hook.getKeyWithoutModifier((Keys)Properties.Settings.Default.hotkeyMute)); }
+            catch (InvalidOperationException exception) { }
+            try { hook.RegisterHotKey(hook.Win32ModifiersFromKeys((Keys)Properties.Settings.Default.hotkeyShuffle), hook.getKeyWithoutModifier((Keys)Properties.Settings.Default.hotkeyShuffle)); }
+            catch (InvalidOperationException exception) { }
+        }
 
         void hook_KeyPressed(object sender, KeyPressedEventArgs e)
         {
@@ -447,50 +448,50 @@ namespace WinGrooves
                     break;
             }
 
-			uint KeyAsInt = (uint)(e.Key | hook.keyToModifierKey(e.Modifier));
-			if (KeyAsInt == Properties.Settings.Default.hotkeyPlay)
-			{
-				htmlClickOn("#player_play_pause");
-			} 
-			else if (KeyAsInt == Properties.Settings.Default.hotkeyNext)
-			{
-				htmlClickOn("#player_next");
-			}
-			else if (KeyAsInt == Properties.Settings.Default.hotkeyPrevious)
-			{
-				htmlClickOn("#player_previous");
-			}
-			else if (KeyAsInt == Properties.Settings.Default.hotkeyLike)
-			{
-				htmlClickOn("#queue_list_window .queue-item-active .smile");
-			}
-			else if (KeyAsInt == Properties.Settings.Default.hotkeyDislike)
-			{
-				htmlClickOn("#queue_list_window .queue-item-active .frown");
-			}
-			else if (KeyAsInt == Properties.Settings.Default.hotkeyFavorite)
-			{
-				htmlClickOn("#playerDetails_nowPlaying .add");
-				htmlClickOn("#playerDetails_nowPlaying .favorite");
-			}
-			else if (KeyAsInt == Properties.Settings.Default.hotkeyMute)
-			{
-				htmlClickOn("#player_volume");
-			}
-			else if (KeyAsInt == Properties.Settings.Default.hotkeyShowHide)
-			{
-				showHideWindow();
-			}
-			else if (KeyAsInt == Properties.Settings.Default.hotkeyShuffle)
-			{
-				htmlClickOn("#player_shuffle");
-			}
+            uint KeyAsInt = (uint)(e.Key | hook.keyToModifierKey(e.Modifier));
+            if (KeyAsInt == Properties.Settings.Default.hotkeyPlay)
+            {
+                htmlClickOn("#player_play_pause");
+            }
+            else if (KeyAsInt == Properties.Settings.Default.hotkeyNext)
+            {
+                htmlClickOn("#player_next");
+            }
+            else if (KeyAsInt == Properties.Settings.Default.hotkeyPrevious)
+            {
+                htmlClickOn("#player_previous");
+            }
+            else if (KeyAsInt == Properties.Settings.Default.hotkeyLike)
+            {
+                htmlClickOn("#queue_list_window .queue-item-active .smile");
+            }
+            else if (KeyAsInt == Properties.Settings.Default.hotkeyDislike)
+            {
+                htmlClickOn("#queue_list_window .queue-item-active .frown");
+            }
+            else if (KeyAsInt == Properties.Settings.Default.hotkeyFavorite)
+            {
+                htmlClickOn("#playerDetails_nowPlaying .add");
+                htmlClickOn("#playerDetails_nowPlaying .favorite");
+            }
+            else if (KeyAsInt == Properties.Settings.Default.hotkeyMute)
+            {
+                htmlClickOn("#player_volume");
+            }
+            else if (KeyAsInt == Properties.Settings.Default.hotkeyShowHide)
+            {
+                showHideWindow();
+            }
+            else if (KeyAsInt == Properties.Settings.Default.hotkeyShuffle)
+            {
+                htmlClickOn("#player_shuffle");
+            }
         }
 
         private void toolStripMenuItem1_Click(object sender, EventArgs e)
         {
-			OptionsForm optionsDialog = new OptionsForm();
-			optionsDialog.ShowDialog(this);
+            OptionsForm optionsDialog = new OptionsForm();
+            optionsDialog.ShowDialog(this);
         }
 
         private void toolStripButton1_Click(object sender, EventArgs e)
@@ -506,85 +507,93 @@ namespace WinGrooves
         private void toolStripButton3_Click(object sender, EventArgs e)
         {
             OptionsForm optionsDialog = new OptionsForm();
-			optionsDialog.ShowDialog(this);
+            optionsDialog.ShowDialog(this);
         }
 
-		private void About_Click(object sender, EventArgs e)
-		{
-			AboutBox1 aboutDialog = new AboutBox1();
-			aboutDialog.ShowDialog(this);
-		}
+        private void About_Click(object sender, EventArgs e)
+        {
+            AboutBox1 aboutDialog = new AboutBox1();
+            aboutDialog.ShowDialog(this);
+        }
 
-		private void currentSongTimer_Tick(object sender, EventArgs e)
-		{
-			if (webBrowser1.ReadyState == WebBrowserReadyState.Complete)
-			{
-				try {
-                    
-					if (!injectedSongInfoFunctions)
-					{
-						HtmlElement head = webBrowser1.Document.GetElementsByTagName("head")[0];
-						HtmlElement scriptEl = webBrowser1.Document.CreateElement("script");
-						IHTMLScriptElement element = (IHTMLScriptElement)scriptEl.DomElement;
-						string injectedJquery = "function getSongTitle() {  return $(\"#playerDetails_nowPlaying .song\").text(); } " + 
-                            "function getSongArtist() {  return $(\"#playerDetails_nowPlaying .artist\").text(); }" + 
+        private void currentSongTimer_Tick(object sender, EventArgs e)
+        {
+            if (webBrowser1.ReadyState == WebBrowserReadyState.Complete)
+            {
+                try
+                {
+
+                    if (!injectedSongInfoFunctions)
+                    {
+                        HtmlElement head = webBrowser1.Document.GetElementsByTagName("head")[0];
+                        HtmlElement scriptEl = webBrowser1.Document.CreateElement("script");
+                        IHTMLScriptElement element = (IHTMLScriptElement)scriptEl.DomElement;
+                        string injectedJquery = "function getSongTitle() {  return $(\"#playerDetails_nowPlaying .song\").text(); } " +
+                            "function getSongArtist() {  return $(\"#playerDetails_nowPlaying .artist\").text(); }" +
                             "function mouseMove() {  $(\"#page_wrapper\").mousemove(); }" +
                             "function clickElement(selector) {  $(selector).click(); }"
                         ;
-						element.text = injectedJquery;
-						head.AppendChild(scriptEl);
+                        element.text = injectedJquery;
+                        head.AppendChild(scriptEl);
 
                         injectedSongInfoFunctions = true;
-					}
+                    }
 
-					object songTitle = webBrowser1.Document.InvokeScript("getSongTitle");
-					object songArtist = webBrowser1.Document.InvokeScript("getSongArtist");
-					//set the Windows title
-					if (songTitle.ToString().Length > 0)
-					{
-						this.Text = songTitle + " - " + songArtist + " - WinGrooves";
-						//set the tray icon text if it is less than 63 characters (the max allowed)
-						if ((songTitle.ToString().Length + songArtist.ToString().Length + 3) < 63)
-						{
-							notifyIcon1.Text = songTitle + " - " + songArtist;
-						}
-						else
-						{
-							notifyIcon1.Text = "WinGrooves";
-						}
-					}
-				}
-				catch (NullReferenceException)
-				{
-					//this should avoid weird errors
-				}
-			}
-		}
+                    object songTitle = webBrowser1.Document.InvokeScript("getSongTitle");
+                    object songArtist = webBrowser1.Document.InvokeScript("getSongArtist");
+                    //set the Windows title
+                    if (songTitle.ToString().Length > 0)
+                    {
+                        this.Text = songTitle + " - " + songArtist + " - WinGrooves";
+                        //set the tray icon text if it is less than 63 characters (the max allowed)
+                        if ((songTitle.ToString().Length + songArtist.ToString().Length + 3) < 63)
+                        {
+                            notifyIcon1.Text = songTitle + " - " + songArtist;
+                        }
+                        else
+                        {
+                            try  // Get what you can up to max length.
+                            {
+                                notifyIcon1.Text = (songTitle + " - " + songArtist).Substring(0, 62);
+                            }
+                            catch // Possible you land right on and under, throwing exception.  handle with old fallback.
+                            {
+                                notifyIcon1.Text = ("WinGrooves");
+                            }
+                        }
+                    }
+                }
+                catch (NullReferenceException)
+                {
+                    //this should avoid weird errors
+                }
+            }
+        }
 
-		private void toolStripMenuItem1_Click_1(object sender, EventArgs e)
-		{
-			OptionsForm optionsDialog = new OptionsForm();
-			optionsDialog.ShowDialog(this);
-		}
+        private void toolStripMenuItem1_Click_1(object sender, EventArgs e)
+        {
+            OptionsForm optionsDialog = new OptionsForm();
+            optionsDialog.ShowDialog(this);
+        }
 
-		private void toolStripButton4_Click(object sender, EventArgs e)
-		{
-			AboutBox1 aboutDialog = new AboutBox1();
-			aboutDialog.ShowDialog(this);
-		}
+        private void toolStripButton4_Click(object sender, EventArgs e)
+        {
+            AboutBox1 aboutDialog = new AboutBox1();
+            aboutDialog.ShowDialog(this);
+        }
 
-		private void webBrowser1_DocumentCompleted(object sender, WebBrowserDocumentCompletedEventArgs e)
-		{
-			currentSongTimer.Enabled = true;
-		}
+        private void webBrowser1_DocumentCompleted(object sender, WebBrowserDocumentCompletedEventArgs e)
+        {
+            currentSongTimer.Enabled = true;
+        }
 
-		private void alwaysListeningTimer_Tick(object sender, EventArgs e)
-		{
+        private void alwaysListeningTimer_Tick(object sender, EventArgs e)
+        {
             if (webBrowser1.ReadyState == WebBrowserReadyState.Complete)
-			{
+            {
                 //this will simulate moving the mouse so that the player doesn't stop playing music after a few minutes of not interacting with the page
                 webBrowser1.Document.InvokeScript("mouseMove");
-			}
-		}
-	}
+            }
+        }
+    }
 }
