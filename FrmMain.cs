@@ -24,6 +24,7 @@ namespace WinGrooves
         const int VK_MEDIA_PLAY_PAUSE = 0xB3;
 
         public static KeyboardHook hook = new KeyboardHook();
+        bool windowInitialized;
 
         private NotifyIcon notifyIcon1;
         private ContextMenuStrip contextMenuStrip1;
@@ -69,6 +70,104 @@ namespace WinGrooves
             //
             InitializeComponent();
             this.Resize += new EventHandler(FrmMain_Resize);
+
+            //code to remember window size and position
+            // this is the default
+            this.WindowState = FormWindowState.Normal;
+            this.StartPosition = FormStartPosition.WindowsDefaultBounds;
+
+            // check if the saved bounds are nonzero and visible on any screen
+            if (Properties.Settings.Default.WindowPosition != Rectangle.Empty &&
+                IsVisibleOnAnyScreen(Properties.Settings.Default.WindowPosition))
+            {
+                // first set the bounds
+                this.StartPosition = FormStartPosition.Manual;
+                this.DesktopBounds = Properties.Settings.Default.WindowPosition;
+
+                // afterwards set the window state to the saved value (which could be Maximized)
+                this.WindowState = Properties.Settings.Default.WindowState;
+            }
+            else
+            {
+                // this resets the upper left corner of the window to windows standards
+                this.StartPosition = FormStartPosition.WindowsDefaultLocation;
+
+                // we can still apply the saved size
+                // msorens: added gatekeeper, otherwise first time appears as just a title bar!
+                if (Properties.Settings.Default.WindowPosition != Rectangle.Empty)
+                {
+                    this.Size = Properties.Settings.Default.WindowPosition.Size;
+                }
+            }
+            windowInitialized = true;
+		}
+
+        private bool IsVisibleOnAnyScreen(Rectangle rect)
+        {
+            foreach (Screen screen in Screen.AllScreens)
+            {
+                if (screen.WorkingArea.IntersectsWith(rect))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        protected override void OnClosed(EventArgs e)
+        {
+            base.OnClosed(e);
+
+            // only save the WindowState if Normal or Maximized
+            switch (this.WindowState)
+            {
+                case FormWindowState.Normal:
+                case FormWindowState.Maximized:
+                    Properties.Settings.Default.WindowState = this.WindowState;
+                    break;
+
+                default:
+                    Properties.Settings.Default.WindowState = FormWindowState.Normal;
+                    break;
+            }
+
+            # region msorens: this code does *not* handle minimized/maximized window.
+
+            // reset window state to normal to get the correct bounds
+            // also make the form invisible to prevent distracting the user
+            //this.Visible = false;
+            //this.WindowState = FormWindowState.Normal;
+            //Settings.Default.WindowPosition = this.DesktopBounds;
+
+            # endregion
+
+            Properties.Settings.Default.Save();
+        }
+
+        protected override void OnResize(EventArgs e)
+        {
+            base.OnResize(e);
+            TrackWindowState();
+        }
+
+        protected override void OnMove(EventArgs e)
+        {
+            base.OnMove(e);
+            TrackWindowState();
+        }
+
+        // On a move or resize in Normal state, record the new values as they occur.
+        // This solves the problem of closing the app when minimized or maximized.
+        private void TrackWindowState()
+        {
+            // Don't record the window setup, otherwise we lose the persistent values!
+            if (!windowInitialized) { return; }
+
+            if (WindowState == FormWindowState.Normal)
+            {
+                Properties.Settings.Default.WindowPosition = this.DesktopBounds;
+            }
         }
 
         /// <summary>
@@ -126,7 +225,7 @@ namespace WinGrooves
             this.webBrowser1.MinimumSize = new System.Drawing.Size(20, 20);
             this.webBrowser1.Name = "webBrowser1";
             this.webBrowser1.ScriptErrorsSuppressed = true;
-            this.webBrowser1.Size = new System.Drawing.Size(1008, 537);
+            this.webBrowser1.Size = new System.Drawing.Size(1517, 690);
             this.webBrowser1.TabIndex = 9;
             this.webBrowser1.Url = new System.Uri("", System.UriKind.Relative);
             this.webBrowser1.DocumentCompleted += new System.Windows.Forms.WebBrowserDocumentCompletedEventHandler(this.webBrowser1_DocumentCompleted);
@@ -223,7 +322,7 @@ namespace WinGrooves
             this.toolStripButton4});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(1008, 25);
+            this.toolStrip1.Size = new System.Drawing.Size(1517, 25);
             this.toolStrip1.TabIndex = 10;
             this.toolStrip1.Text = "toolStrip1";
             // 
@@ -281,7 +380,7 @@ namespace WinGrooves
             // 
             this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
             this.CausesValidation = false;
-            this.ClientSize = new System.Drawing.Size(1008, 562);
+            this.ClientSize = new System.Drawing.Size(1517, 715);
             this.Controls.Add(this.webBrowser1);
             this.Controls.Add(this.toolStrip1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
