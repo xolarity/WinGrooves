@@ -6,6 +6,9 @@ using System.Windows.Forms;
 using System.Runtime.InteropServices;
 using System.IO;
 using mshtml;
+using Microsoft.WindowsAPICodePack;
+using Microsoft.WindowsAPICodePack.Controls;
+using Microsoft.WindowsAPICodePack.Taskbar;
 
 namespace WinGrooves
 {
@@ -63,6 +66,12 @@ namespace WinGrooves
         [MarshalAs(UnmanagedType.U4)] int dwFlags,
         bool fEnable);
 
+        //Windows 7 features
+        private ThumbnailToolbarButton buttonPrev;
+        private bool isbuttonPaused, isMusicPlaying;
+        private ThumbnailToolbarButton buttonPause;
+        private ThumbnailToolbarButton buttonNext;
+
         public FrmMain()
         {
             //
@@ -99,6 +108,7 @@ namespace WinGrooves
                     this.Size = Properties.Settings.Default.WindowPosition.Size;
                 }
             }
+
             windowInitialized = true;
 		}
 
@@ -225,7 +235,7 @@ namespace WinGrooves
             this.webBrowser1.MinimumSize = new System.Drawing.Size(20, 20);
             this.webBrowser1.Name = "webBrowser1";
             this.webBrowser1.ScriptErrorsSuppressed = true;
-            this.webBrowser1.Size = new System.Drawing.Size(1517, 690);
+            this.webBrowser1.Size = new System.Drawing.Size(1370, 690);
             this.webBrowser1.TabIndex = 9;
             this.webBrowser1.Url = new System.Uri("", System.UriKind.Relative);
             this.webBrowser1.DocumentCompleted += new System.Windows.Forms.WebBrowserDocumentCompletedEventHandler(this.webBrowser1_DocumentCompleted);
@@ -322,7 +332,7 @@ namespace WinGrooves
             this.toolStripButton4});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(1517, 25);
+            this.toolStrip1.Size = new System.Drawing.Size(1370, 25);
             this.toolStrip1.TabIndex = 10;
             this.toolStrip1.Text = "toolStrip1";
             // 
@@ -375,12 +385,23 @@ namespace WinGrooves
             this.alwaysListeningTimer.Enabled = true;
             this.alwaysListeningTimer.Interval = 600000;
             this.alwaysListeningTimer.Tick += new System.EventHandler(this.alwaysListeningTimer_Tick);
+
+
+            //
+            // Win 7 stuff
+            //
+            this.buttonPrev = new ThumbnailToolbarButton(Properties.Resources.PlayerPrev, "Previous Music");
+            this.buttonPause = new ThumbnailToolbarButton(Properties.Resources.PlayerPlay, "Pause Music");
+            this.isbuttonPaused = true;
+            this.isMusicPlaying = false;
+            this.buttonNext = new ThumbnailToolbarButton(Properties.Resources.PlayerNext, "Next Music");
+
             // 
             // FrmMain
             // 
             this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
             this.CausesValidation = false;
-            this.ClientSize = new System.Drawing.Size(1517, 715);
+            this.ClientSize = new System.Drawing.Size(1370, 715);
             this.Controls.Add(this.webBrowser1);
             this.Controls.Add(this.toolStrip1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -431,8 +452,19 @@ namespace WinGrooves
             {
                 showHideWindow();
             }
-        }
+            //Thumbnail buttons for win7 users
+            if (TaskbarManager.IsPlatformSupported)
+            {
+                buttonPrev.Click += new EventHandler<ThumbnailButtonClickedEventArgs>(Previous_Click);
+                buttonPause.Click += new EventHandler<ThumbnailButtonClickedEventArgs>(Play_Click);
+                buttonNext.Click += new EventHandler<ThumbnailButtonClickedEventArgs>(Next_Click);
 
+                //Add the buttons
+                ThumbnailToolbarButton[] buttonList = new ThumbnailToolbarButton[3];
+                buttonList[0] = buttonPrev; buttonList[1] = buttonPause; buttonList[2] = buttonNext;
+                TaskbarManager.Instance.ThumbnailToolbars.AddButtons(this.Handle, buttonList);
+            }
+        }
         /*
          * Simulates a browser click on an html element
          /// <param name="action">the HTML id of the element to click on/param>
@@ -508,6 +540,13 @@ namespace WinGrooves
 
         private void Play_Click(object sender, EventArgs e)
         {
+            if (TaskbarManager.IsPlatformSupported)
+            {
+                //this only shortens the delay of the button chnage, theres is need to be a disabled state !
+                if (isbuttonPaused) { buttonPause.Icon = Properties.Resources.PlayerPause; isbuttonPaused = false;}
+                if (!isbuttonPaused) { buttonPause.Icon = Properties.Resources.PlayerPlay; isbuttonPaused = true;}
+            }
+          
             playerExecute("player_play_pause");
         }
 
@@ -652,7 +691,8 @@ namespace WinGrooves
                         string injectedJquery = "function getSongTitle() {  return $(\"#playerDetails_nowPlaying .song\").text(); } " +
                             "function getSongArtist() {  return $(\"#playerDetails_nowPlaying .artist\").text(); }" +
                             "function mouseMove() {  $(\"#page_wrapper\").mousemove(); }" +
-                            "function clickElement(selector) {  $(selector).click(); }"
+                            "function clickElement(selector) {  $(selector).click(); }" +
+                            "function getMusicState() {return $(\"#player_play_pause\").hasClass(\"pause\"); }"
                         ;
                         element.text = injectedJquery;
                         head.AppendChild(scriptEl);
@@ -683,6 +723,26 @@ namespace WinGrooves
                             }
                         }
                     }
+
+                    //control thumbail icons
+                    if (TaskbarManager.IsPlatformSupported)
+                    {
+                        //the elemtn class of the play button on grooveshark changes according to the music state (contains play/paused/nothing)
+                        //Can't figure a mutch better way to control the thumbnail states though.
+                        if (Convert.ToBoolean(webBrowser1.Document.InvokeScript("getMusicState")))
+                        {
+                            buttonPause.Icon = Properties.Resources.PlayerPause;
+                            isbuttonPaused = false;
+                        }
+                        else
+                        {
+                            buttonPause.Icon = Properties.Resources.PlayerPlay;
+                            isbuttonPaused = true;
+                        }
+                    }
+
+
+                   // HandleThumbnailButtons();
                 }
                 catch (NullReferenceException)
                 {
