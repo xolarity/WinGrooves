@@ -388,10 +388,10 @@ namespace WinGrooves
 
 
             //
-            // Win 7 stuff
+            // Win 7 toolbar buttons
             //
             this.buttonPrev = new ThumbnailToolbarButton(Properties.Resources.PlayerPrev, "Previous Music");
-            this.buttonPause = new ThumbnailToolbarButton(Properties.Resources.PlayerPlay, "Pause Music");
+            this.buttonPause = new ThumbnailToolbarButton(Properties.Resources.PlayerPlay, "Pause/Play Music");
             this.isbuttonPaused = true;
             this.isMusicPlaying = false;
             this.buttonNext = new ThumbnailToolbarButton(Properties.Resources.PlayerNext, "Next Music");
@@ -459,7 +459,7 @@ namespace WinGrooves
                 buttonPause.Click += new EventHandler<ThumbnailButtonClickedEventArgs>(Play_Click);
                 buttonNext.Click += new EventHandler<ThumbnailButtonClickedEventArgs>(Next_Click);
 
-                //Add the buttons
+                //Add the buttons (kinda of ugly tough)
                 ThumbnailToolbarButton[] buttonList = new ThumbnailToolbarButton[3];
                 buttonList[0] = buttonPrev; buttonList[1] = buttonPause; buttonList[2] = buttonNext;
                 TaskbarManager.Instance.ThumbnailToolbars.AddButtons(this.Handle, buttonList);
@@ -542,7 +542,7 @@ namespace WinGrooves
         {
             if (TaskbarManager.IsPlatformSupported)
             {
-                //this only shortens the delay of the button chnage, theres is need to be a disabled state !
+                //this only shortens the delay of the button chanhe, theres need to have a disabled state !
                 if (isbuttonPaused) { buttonPause.Icon = Properties.Resources.PlayerPause; isbuttonPaused = false;}
                 if (!isbuttonPaused) { buttonPause.Icon = Properties.Resources.PlayerPlay; isbuttonPaused = true;}
             }
@@ -727,8 +727,8 @@ namespace WinGrooves
                     //control thumbail icons
                     if (TaskbarManager.IsPlatformSupported)
                     {
-                        //the elemtn class of the play button on grooveshark changes according to the music state (contains play/paused/nothing)
-                        //Can't figure a mutch better way to control the thumbnail states though.
+                        //the element class of the play button on grooveshark changes according to the music state (contains play/paused/nothing)
+                        //I can't figure a better way to control the thumbnail states.
                         if (Convert.ToBoolean(webBrowser1.Document.InvokeScript("getMusicState")))
                         {
                             buttonPause.Icon = Properties.Resources.PlayerPause;
