@@ -235,7 +235,7 @@ namespace WinGrooves
             this.webBrowser1.MinimumSize = new System.Drawing.Size(20, 20);
             this.webBrowser1.Name = "webBrowser1";
             this.webBrowser1.ScriptErrorsSuppressed = true;
-            this.webBrowser1.Size = new System.Drawing.Size(1370, 690);
+            this.webBrowser1.Size = new System.Drawing.Size(1517, 690);
             this.webBrowser1.TabIndex = 9;
             this.webBrowser1.Url = new System.Uri("", System.UriKind.Relative);
             this.webBrowser1.DocumentCompleted += new System.Windows.Forms.WebBrowserDocumentCompletedEventHandler(this.webBrowser1_DocumentCompleted);
@@ -332,7 +332,7 @@ namespace WinGrooves
             this.toolStripButton4});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(1370, 25);
+            this.toolStrip1.Size = new System.Drawing.Size(1517, 25);
             this.toolStrip1.TabIndex = 10;
             this.toolStrip1.Text = "toolStrip1";
             // 
@@ -401,7 +401,7 @@ namespace WinGrooves
             // 
             this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
             this.CausesValidation = false;
-            this.ClientSize = new System.Drawing.Size(1370, 715);
+            this.ClientSize = new System.Drawing.Size(1517, 715);
             this.Controls.Add(this.webBrowser1);
             this.Controls.Add(this.toolStrip1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -631,8 +631,8 @@ namespace WinGrooves
             }
             else if (KeyAsInt == Properties.Settings.Default.hotkeyFavorite)
             {
-                htmlClickOn("#playerDetails_nowPlaying .add");
-                htmlClickOn("#playerDetails_nowPlaying .favorite");
+                htmlClickOn("#playerDetails_nowPlaying_options");
+                htmlClickOn("#jjmenu_main .jj_menu_item_favorites");
             }
             else if (KeyAsInt == Properties.Settings.Default.hotkeyMute)
             {
