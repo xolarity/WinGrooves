@@ -20,6 +20,7 @@ namespace WinGrooves
         private WebBrowser webBrowser1;
         private System.ComponentModel.IContainer components;
         private bool injectedSongInfoFunctions = false;
+        private bool closingFromTray = false;
         const int WM_HOTKEY = 0x0312;
         const int VK_MEDIA_NEXT_TRACK = 0xB0;
         const int VK_MEDIA_PREV_TRACK = 0xB1;
@@ -57,6 +58,8 @@ namespace WinGrooves
         private const int SET_FEATURE_ON_THREAD_INTRANET = 0x00000010;
         private const int SET_FEATURE_ON_THREAD_TRUSTED = 0x00000020;
         private const int SET_FEATURE_ON_THREAD_INTERNET = 0x00000040;
+        private ToolStripMenuItem Like;
+        private ToolStripMenuItem Dislike;
         private const int SET_FEATURE_ON_THREAD_RESTRICTED = 0x00000080;
         [DllImport("urlmon.dll")]
         [PreserveSig]
@@ -215,6 +218,8 @@ namespace WinGrooves
             this.Previous = new System.Windows.Forms.ToolStripMenuItem();
             this.Next = new System.Windows.Forms.ToolStripMenuItem();
             this.Play = new System.Windows.Forms.ToolStripMenuItem();
+            this.Like = new System.Windows.Forms.ToolStripMenuItem();
+            this.Dislike = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.Exit = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
@@ -258,67 +263,83 @@ namespace WinGrooves
             this.Previous,
             this.Next,
             this.Play,
+            this.Like,
+            this.Dislike,
             this.toolStripSeparator1,
             this.Exit});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(150, 170);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(182, 236);
             // 
             // HideShow
             // 
             this.HideShow.Name = "HideShow";
-            this.HideShow.Size = new System.Drawing.Size(149, 22);
+            this.HideShow.Size = new System.Drawing.Size(181, 22);
             this.HideShow.Text = "Show/Hide";
             this.HideShow.Click += new System.EventHandler(this.HideShow_Click);
             // 
             // toolStripMenuItem1
             // 
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(149, 22);
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(181, 22);
             this.toolStripMenuItem1.Text = "Options";
             this.toolStripMenuItem1.Click += new System.EventHandler(this.toolStripMenuItem1_Click_1);
             // 
             // About
             // 
             this.About.Name = "About";
-            this.About.Size = new System.Drawing.Size(149, 22);
+            this.About.Size = new System.Drawing.Size(181, 22);
             this.About.Text = "About";
             this.About.Click += new System.EventHandler(this.About_Click);
             // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(146, 6);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(178, 6);
             // 
             // Previous
             // 
             this.Previous.Name = "Previous";
-            this.Previous.Size = new System.Drawing.Size(149, 22);
+            this.Previous.Size = new System.Drawing.Size(181, 22);
             this.Previous.Text = "Previous Song";
             this.Previous.Click += new System.EventHandler(this.Previous_Click);
             // 
             // Next
             // 
             this.Next.Name = "Next";
-            this.Next.Size = new System.Drawing.Size(149, 22);
+            this.Next.Size = new System.Drawing.Size(181, 22);
             this.Next.Text = "Next Song";
             this.Next.Click += new System.EventHandler(this.Next_Click);
             // 
             // Play
             // 
             this.Play.Name = "Play";
-            this.Play.Size = new System.Drawing.Size(149, 22);
+            this.Play.Size = new System.Drawing.Size(181, 22);
             this.Play.Text = "Play/Pause";
             this.Play.Click += new System.EventHandler(this.Play_Click);
+            // 
+            // Like
+            // 
+            this.Like.Name = "Like";
+            this.Like.Size = new System.Drawing.Size(181, 22);
+            this.Like.Text = "Like Current Song";
+            this.Like.Click += new System.EventHandler(this.Like_Click);
+            // 
+            // Dislike
+            // 
+            this.Dislike.Name = "Dislike";
+            this.Dislike.Size = new System.Drawing.Size(181, 22);
+            this.Dislike.Text = "Dislike Current Song";
+            this.Dislike.Click += new System.EventHandler(this.Dislike_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(146, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(178, 6);
             // 
             // Exit
             // 
             this.Exit.Name = "Exit";
-            this.Exit.Size = new System.Drawing.Size(149, 22);
+            this.Exit.Size = new System.Drawing.Size(181, 22);
             this.Exit.Text = "Exit";
             this.Exit.Click += new System.EventHandler(this.Exit_Click);
             // 
@@ -386,7 +407,6 @@ namespace WinGrooves
             this.alwaysListeningTimer.Interval = 600000;
             this.alwaysListeningTimer.Tick += new System.EventHandler(this.alwaysListeningTimer_Tick);
 
-
             //
             // Win 7 toolbar buttons
             //
@@ -396,6 +416,7 @@ namespace WinGrooves
             this.isMusicPlaying = false;
             this.buttonNext = new ThumbnailToolbarButton(Properties.Resources.PlayerNext, "Next Music");
 
+            
             // 
             // FrmMain
             // 
@@ -409,6 +430,7 @@ namespace WinGrooves
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "WinGrooves";
             this.Activated += new System.EventHandler(this.FrmMain_Activated);
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FrmMain_FormClosing);
             this.Load += new System.EventHandler(this.FrmMain_Load);
             this.contextMenuStrip1.ResumeLayout(false);
             this.toolStrip1.ResumeLayout(false);
@@ -513,6 +535,7 @@ namespace WinGrooves
         private void Exit_Click(object sender, EventArgs e)
         {
             Properties.Settings.Default.Save();
+            closingFromTray = true;
             Close();
         }
 
@@ -542,7 +565,7 @@ namespace WinGrooves
         {
             if (TaskbarManager.IsPlatformSupported)
             {
-                //this only shortens the delay of the button chanhe, theres need to have a disabled state !
+                //this only shortens the delay of the button change. Need to have a disabled state!
                 if (isbuttonPaused) { buttonPause.Icon = Properties.Resources.PlayerPause; isbuttonPaused = false;}
                 if (!isbuttonPaused) { buttonPause.Icon = Properties.Resources.PlayerPlay; isbuttonPaused = true;}
             }
@@ -623,11 +646,11 @@ namespace WinGrooves
             }
             else if (KeyAsInt == Properties.Settings.Default.hotkeyLike)
             {
-                htmlClickOn("#queue_list_window .queue-item-active .smile");
+                LikeCurrentSong();
             }
             else if (KeyAsInt == Properties.Settings.Default.hotkeyDislike)
             {
-                htmlClickOn("#queue_list_window .queue-item-active .frown");
+                DislikeCurrentSong();
             }
             else if (KeyAsInt == Properties.Settings.Default.hotkeyFavorite)
             {
@@ -775,6 +798,35 @@ namespace WinGrooves
                 //this will simulate moving the mouse so that the player doesn't stop playing music after a few minutes of not interacting with the page
                 webBrowser1.Document.InvokeScript("mouseMove");
             }
+        }
+
+        private void FrmMain_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (!closingFromTray && Properties.Settings.Default.trayClose)
+            {
+                e.Cancel = true;
+                Hide();
+            }
+        }
+
+        private void Like_Click(object sender, EventArgs e)
+        {
+            LikeCurrentSong();
+        }
+
+        private void LikeCurrentSong()
+        {
+            htmlClickOn("#queue_list_window .queue-item-active .smile");
+        }
+
+        private void DislikeCurrentSong()
+        {
+            htmlClickOn("#queue_list_window .queue-item-active .frown");
+        }
+
+        private void Dislike_Click(object sender, EventArgs e)
+        {
+            DislikeCurrentSong();
         }
     }
 }

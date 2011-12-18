@@ -133,7 +133,6 @@
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "About WinGrooves";
-            this.Load += new System.EventHandler(this.AboutBox1_Load);
             ((System.ComponentModel.ISupportInitialize)(this.logoPictureBox)).EndInit();
             this.tableLayoutPanel.ResumeLayout(false);
             this.tableLayoutPanel.PerformLayout();

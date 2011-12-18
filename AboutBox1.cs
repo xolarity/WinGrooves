@@ -98,15 +98,11 @@ namespace WinGrooves
         }
         #endregion
 
+
 		private void button1_Click(object sender, EventArgs e)
 		{
 			System.Diagnostics.Process.Start("http://www.wingrooves.com");
 		}
-
-        private void AboutBox1_Load(object sender, EventArgs e)
-        {
-
-        }
 
     }
 }
