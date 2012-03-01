@@ -546,10 +546,12 @@ namespace WinGrooves
 
         private void showHideWindow()
         {
-            if (this.WindowState == FormWindowState.Minimized)
+            if (this.WindowState == FormWindowState.Minimized || this.Visible == false)
             {
                 Show();
                 WindowState = FormWindowState.Normal;
+                TopMost = true; 
+                
             }
             else
             {
