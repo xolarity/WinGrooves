@@ -546,12 +546,10 @@ namespace WinGrooves
 
         private void showHideWindow()
         {
-            if (this.WindowState == FormWindowState.Minimized || this.Visible == false)
+            if (this.WindowState == FormWindowState.Minimized)
             {
                 Show();
                 WindowState = FormWindowState.Normal;
-                TopMost = true; 
-                
             }
             else
             {
@@ -572,17 +570,17 @@ namespace WinGrooves
                 if (!isbuttonPaused) { buttonPause.Icon = Properties.Resources.PlayerPlay; isbuttonPaused = true;}
             }
           
-            playerExecute("player_play_pause");
+            playerExecute("play-pause");
         }
 
         private void Next_Click(object sender, EventArgs e)
         {
-            playerExecute("player_next");
+            playerExecute("play-next");
         }
 
         private void Previous_Click(object sender, EventArgs e)
         {
-            playerExecute("player_previous");
+            playerExecute("play-prev");
         }
 
         private void SetupGlobalHotkeys()
@@ -623,28 +621,28 @@ namespace WinGrooves
             switch (e.Key.ToString())
             {
                 case "MediaPlayPause":
-                    playerExecute("player_play_pause");
+                    playerExecute("play-pause");
                     break;
                 case "MediaNextTrack":
-                    playerExecute("player_next");
+                    playerExecute("play-next");
                     break;
                 case "MediaPreviousTrack":
-                    playerExecute("player_previous");
+                    playerExecute("play-prev");
                     break;
             }
 
             uint KeyAsInt = (uint)(e.Key | hook.keyToModifierKey(e.Modifier));
             if (KeyAsInt == Properties.Settings.Default.hotkeyPlay)
             {
-                htmlClickOn("#player_play_pause");
+				htmlClickOn("#play-pause");
             }
             else if (KeyAsInt == Properties.Settings.Default.hotkeyNext)
             {
-                htmlClickOn("#player_next");
+				htmlClickOn("#play-next");
             }
             else if (KeyAsInt == Properties.Settings.Default.hotkeyPrevious)
             {
-                htmlClickOn("#player_previous");
+				htmlClickOn("#play-prev");
             }
             else if (KeyAsInt == Properties.Settings.Default.hotkeyLike)
             {
@@ -656,12 +654,11 @@ namespace WinGrooves
             }
             else if (KeyAsInt == Properties.Settings.Default.hotkeyFavorite)
             {
-                htmlClickOn("#playerDetails_nowPlaying_options");
-                htmlClickOn("#jjmenu_main .jj_menu_item_favorites");
+                htmlClickOn("#np-fav");
             }
             else if (KeyAsInt == Properties.Settings.Default.hotkeyMute)
             {
-                htmlClickOn("#player_volume");
+				htmlClickOn("#volume");
             }
             else if (KeyAsInt == Properties.Settings.Default.hotkeyShowHide)
             {
@@ -669,7 +666,7 @@ namespace WinGrooves
             }
             else if (KeyAsInt == Properties.Settings.Default.hotkeyShuffle)
             {
-                htmlClickOn("#player_shuffle");
+				htmlClickOn("#shuffle");
             }
         }
 
@@ -717,7 +714,7 @@ namespace WinGrooves
                             "function getSongArtist() {  return $(\"#playerDetails_nowPlaying .artist\").text(); }" +
                             "function mouseMove() {  $(\"#page_wrapper\").mousemove(); }" +
                             "function clickElement(selector) {  $(selector).click(); }" +
-                            "function getMusicState() {return $(\"#player_play_pause\").hasClass(\"pause\"); }"
+                            "function getMusicState() {return $(\"#play-pause\").hasClass(\"paused\"); }"
                         ;
                         element.text = injectedJquery;
                         head.AppendChild(scriptEl);
@@ -818,12 +815,14 @@ namespace WinGrooves
 
         private void LikeCurrentSong()
         {
-            htmlClickOn("#queue_list_window .queue-item-active .smile");
+            htmlClickOn("#np-menu");
+            htmlClickOn("#jjmenu_main .jj_menu_item_frown");
         }
 
         private void DislikeCurrentSong()
         {
-            htmlClickOn("#queue_list_window .queue-item-active .frown");
+            htmlClickOn("#np-menu");
+            htmlClickOn("#jjmenu_main .jj_menu_item_smile");
         }
 
         private void Dislike_Click(object sender, EventArgs e)
