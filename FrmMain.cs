@@ -717,15 +717,14 @@ namespace WinGrooves
             {
                 try
                 {
-
                     if (!injectedSongInfoFunctions)
                     {
                         HtmlElement head = webBrowser1.Document.GetElementsByTagName("head")[0];
                         HtmlElement scriptEl = webBrowser1.Document.CreateElement("script");
                         IHTMLScriptElement element = (IHTMLScriptElement)scriptEl.DomElement;
-                        string injectedJquery = "function getSongTitle() {  return $(\"#playerDetails_nowPlaying .song\").text(); } " +
-                            "function getSongArtist() {  return $(\"#playerDetails_nowPlaying .artist\").text(); }" +
-                            "function mouseMove() {  $(\"#page_wrapper\").mousemove(); }" +
+                        string injectedJquery = "function getSongTitle() {  return $(\"#now-playing-metadata .song\").text(); } " +
+                            "function getSongArtist() {  return $(\"#now-playing-metadata .artist\").text(); }" + 
+                            "function mouseMove() {  $(\"#page-wrapper\").mousemove(); }" +
                             "function clickElement(selector) {  $(selector).click(); }" +
                             "function getMusicState() {return $(\"#play-pause\").hasClass(\"paused\"); }"
                         ;
@@ -737,13 +736,12 @@ namespace WinGrooves
 
                     object songTitle = webBrowser1.Document.InvokeScript("getSongTitle");
 
-
                     //Since the song title changed we must update all the information
                     if (String.IsNullOrEmpty(_cachedSongTitle) || _cachedSongTitle != songTitle.ToString())
                     {
+                        
                         //cache new song title so we can tell if it changes again
                         _cachedSongTitle = songTitle.ToString();
-
 
                         //Update thumbnail with album art cover
                         UpdateThumbnail();
@@ -766,7 +764,6 @@ namespace WinGrooves
                                     notifyIcon1.Text = (songTitle + " - " + songArtist).Substring(0, 62);
                                 }
                                 catch
-                                    // Possible you land right on and under, throwing exception.  handle with old fallback.
                                 {
                                     notifyIcon1.Text = ("WinGrooves");
                                 }
@@ -788,7 +785,6 @@ namespace WinGrooves
                                 buttonPause.Icon = Properties.Resources.PlayerPlay;
                                 isbuttonPaused = true;
                             }
-
                         }
                     }
                 }
@@ -841,14 +837,12 @@ namespace WinGrooves
 
         private void LikeCurrentSong()
         {
-            htmlClickOn("#np-menu");
-            htmlClickOn("#jjmenu_main .jj_menu_item_frown");
+            htmlClickOn("#player-wrapper .queue-item-active .smile");
         }
 
         private void DislikeCurrentSong()
         {
-            htmlClickOn("#np-menu");
-            htmlClickOn("#jjmenu_main .jj_menu_item_smile");
+            htmlClickOn("#player-wrapper .queue-item-active .frown");
         }
 
         private void Dislike_Click(object sender, EventArgs e)

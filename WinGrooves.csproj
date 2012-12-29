@@ -7,8 +7,7 @@
     <ProjectGuid>{18215C6D-2A47-4EF5-BBD4-8D237DA30049}</ProjectGuid>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ApplicationIcon>
-    </ApplicationIcon>
+    <ApplicationIcon>wingrooves_combined.ico</ApplicationIcon>
     <AssemblyKeyContainerName />
     <AssemblyName>WinGrooves</AssemblyName>
     <AssemblyOriginatorKeyFile />
@@ -43,8 +42,8 @@
     <PublisherName>WinGrooves</PublisherName>
     <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
     <WebPage>publish.htm</WebPage>
-    <ApplicationRevision>6</ApplicationRevision>
-    <ApplicationVersion>1.0.1.6</ApplicationVersion>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.7.0</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
     <PublishWizardCompleted>true</PublishWizardCompleted>
