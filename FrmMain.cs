@@ -2,6 +2,7 @@ using System;
 using System.Drawing;
 using System.Collections;
 using System.ComponentModel;
+using System.Net;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
 using System.IO;
@@ -9,6 +10,7 @@ using mshtml;
 using Microsoft.WindowsAPICodePack;
 using Microsoft.WindowsAPICodePack.Controls;
 using Microsoft.WindowsAPICodePack.Taskbar;
+using WinGrooves.Utils;
 
 namespace WinGrooves
 {
@@ -74,6 +76,9 @@ namespace WinGrooves
         private bool isbuttonPaused, isMusicPlaying;
         private ThumbnailToolbarButton buttonPause;
         private ThumbnailToolbarButton buttonNext;
+        private TabbedThumbnail _customThumbnail; //Taskbar image icon
+
+        private string _cachedSongTitle; //Used to tell if song has changed
 
         public FrmMain()
         {
@@ -477,16 +482,24 @@ namespace WinGrooves
             //Thumbnail buttons for win7 users
             if (TaskbarManager.IsPlatformSupported)
             {
+
+                //Add a thumbnail image during peak
+                _customThumbnail = new TabbedThumbnail(this.Handle, this.Handle);
+                TaskbarManager.Instance.TabbedThumbnail.AddThumbnailPreview(_customThumbnail);
+
+
                 buttonPrev.Click += new EventHandler<ThumbnailButtonClickedEventArgs>(Previous_Click);
                 buttonPause.Click += new EventHandler<ThumbnailButtonClickedEventArgs>(Play_Click);
                 buttonNext.Click += new EventHandler<ThumbnailButtonClickedEventArgs>(Next_Click);
-
+                
                 //Add the buttons (kinda of ugly tough)
                 ThumbnailToolbarButton[] buttonList = new ThumbnailToolbarButton[3];
                 buttonList[0] = buttonPrev; buttonList[1] = buttonPause; buttonList[2] = buttonNext;
                 TaskbarManager.Instance.ThumbnailToolbars.AddButtons(this.Handle, buttonList);
+                
             }
         }
+        
         /*
          * Simulates a browser click on an html element
          /// <param name="action">the HTML id of the element to click on/param>
@@ -723,48 +736,61 @@ namespace WinGrooves
                     }
 
                     object songTitle = webBrowser1.Document.InvokeScript("getSongTitle");
-                    object songArtist = webBrowser1.Document.InvokeScript("getSongArtist");
-                    //set the Windows title
-                    if (songTitle.ToString().Length > 0)
+
+
+                    //Since the song title changed we must update all the information
+                    if (String.IsNullOrEmpty(_cachedSongTitle) || _cachedSongTitle != songTitle.ToString())
                     {
-                        this.Text = songTitle + " - " + songArtist + " - WinGrooves";
-                        //set the tray icon text if it is less than 63 characters (the max allowed)
-                        if ((songTitle.ToString().Length + songArtist.ToString().Length + 3) < 63)
+                        //cache new song title so we can tell if it changes again
+                        _cachedSongTitle = songTitle.ToString();
+
+
+                        //Update thumbnail with album art cover
+                        UpdateThumbnail();
+
+                        //Set the Windows title
+                        object songArtist = webBrowser1.Document.InvokeScript("getSongArtist");
+
+                        if (songTitle.ToString().Length > 0)
                         {
-                            notifyIcon1.Text = songTitle + " - " + songArtist;
+                            this.Text = songTitle + " - " + songArtist + " - WinGrooves";
+                            //set the tray icon text if it is less than 63 characters (the max allowed)
+                            if ((songTitle.ToString().Length + songArtist.ToString().Length + 3) < 63)
+                            {
+                                notifyIcon1.Text = songTitle + " - " + songArtist;
+                            }
+                            else
+                            {
+                                try // Get what you can up to max length.
+                                {
+                                    notifyIcon1.Text = (songTitle + " - " + songArtist).Substring(0, 62);
+                                }
+                                catch
+                                    // Possible you land right on and under, throwing exception.  handle with old fallback.
+                                {
+                                    notifyIcon1.Text = ("WinGrooves");
+                                }
+                            }
                         }
-                        else
+
+                        //control thumbail icons
+                        if (TaskbarManager.IsPlatformSupported)
                         {
-                            try  // Get what you can up to max length.
+                            //the element class of the play button on grooveshark changes according to the music state (contains play/paused/nothing)
+                            //I can't figure a better way to control the thumbnail states.
+                            if (Convert.ToBoolean(webBrowser1.Document.InvokeScript("getMusicState")))
                             {
-                                notifyIcon1.Text = (songTitle + " - " + songArtist).Substring(0, 62);
+                                buttonPause.Icon = Properties.Resources.PlayerPause;
+                                isbuttonPaused = false;
                             }
-                            catch // Possible you land right on and under, throwing exception.  handle with old fallback.
+                            else
                             {
-                                notifyIcon1.Text = ("WinGrooves");
+                                buttonPause.Icon = Properties.Resources.PlayerPlay;
+                                isbuttonPaused = true;
                             }
+
                         }
                     }
-
-                    //control thumbail icons
-                    if (TaskbarManager.IsPlatformSupported)
-                    {
-                        //the element class of the play button on grooveshark changes according to the music state (contains play/paused/nothing)
-                        //I can't figure a better way to control the thumbnail states.
-                        if (Convert.ToBoolean(webBrowser1.Document.InvokeScript("getMusicState")))
-                        {
-                            buttonPause.Icon = Properties.Resources.PlayerPause;
-                            isbuttonPaused = false;
-                        }
-                        else
-                        {
-                            buttonPause.Icon = Properties.Resources.PlayerPlay;
-                            isbuttonPaused = true;
-                        }
-                    }
-
-
-                   // HandleThumbnailButtons();
                 }
                 catch (NullReferenceException)
                 {
@@ -829,5 +855,39 @@ namespace WinGrooves
         {
             DislikeCurrentSong();
         }
+
+        #region Thumbnail Methods
+
+        /// <summary>
+        /// Updates the thumbnail on the Taskbar in Windows 7
+        /// </summary>
+        private void UpdateThumbnail()
+        {
+          
+            var url = webBrowser1.Document.GetElementById("now-playing-image").GetAttribute("src");
+
+            if (String.IsNullOrEmpty(url) || url.EndsWith("40_album.png"))
+            {
+                //there is no album art for this song so lets just redraw the application.
+                _customThumbnail.SetImage(ImageUtils.ApplicationThumbnail(this));
+            }
+            else
+            {
+                //Calculate Album Art URL
+                string urlBase = url.Substring(0, url.LastIndexOf("/") + 1);
+                string fileName = url.Substring(url.LastIndexOf("/") + 1);
+
+                if (fileName.StartsWith("40_"))
+                {
+                    //Build the url for the 120 pixel album art
+                    fileName = String.Format("120{0}", fileName.Substring(fileName.IndexOf("_")));
+                    url = urlBase + fileName;
+                }
+                Bitmap albumPreview = ImageUtils.BitmapFromUrl(url);
+                _customThumbnail.SetImage(albumPreview ?? ImageUtils.ApplicationThumbnail(this));
+            }
+        }
+        #endregion
+
     }
 }
