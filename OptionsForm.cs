@@ -83,5 +83,12 @@ namespace WinGrooves
 
 		}
 
+        private void chkShowSongInBalloon_CheckedChanged(object sender, EventArgs e)
+        {
+            lbVisibleFor.Visible = chkShowSongInBalloon.Checked;
+            numBalloonDelay.Visible = chkShowSongInBalloon.Checked;
+            lbBalloonDelaySeconds.Visible = chkShowSongInBalloon.Checked;
+        }
+
 	}
 }
