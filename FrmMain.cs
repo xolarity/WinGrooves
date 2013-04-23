@@ -11,6 +11,7 @@ using Microsoft.WindowsAPICodePack;
 using Microsoft.WindowsAPICodePack.Controls;
 using Microsoft.WindowsAPICodePack.Taskbar;
 using WinGrooves.Utils;
+using WinGrooves.Properties;
 
 namespace WinGrooves
 {
@@ -51,7 +52,7 @@ namespace WinGrooves
         private Timer alwaysListeningTimer;
         private ToolStripMenuItem Play;
 
-		//These constants are needed to disable the IE click sound
+        //These constants are needed to disable the IE click sound
         private const int FEATURE_DISABLE_NAVIGATION_SOUNDS = 21;
         private const int SET_FEATURE_ON_THREAD = 0x00000001;
         private const int SET_FEATURE_ON_PROCESS = 0x00000002;
@@ -62,6 +63,11 @@ namespace WinGrooves
         private const int SET_FEATURE_ON_THREAD_INTERNET = 0x00000040;
         private ToolStripMenuItem Like;
         private ToolStripMenuItem Dislike;
+        private ToolStripMenuItem shuffleToolStripMenuItem;
+        private ToolStripMenuItem loopSongsToolStripMenuItem;
+        private ToolStripSeparator toolStripMenuItem2;
+        private ToolStripSeparator toolStripMenuItem3;
+        private ToolStripMenuItem muteToolStripMenuItem;
         private const int SET_FEATURE_ON_THREAD_RESTRICTED = 0x00000080;
         [DllImport("urlmon.dll")]
         [PreserveSig]
@@ -117,8 +123,18 @@ namespace WinGrooves
                 }
             }
 
+            //
+            // Win 7 toolbar buttons
+            //
+            //Moved here from initializeComponent method because it is recreated after adding any controls to the form
+            buttonPrev = new ThumbnailToolbarButton(Properties.Resources.PlayerPrev, "Previous Music");
+            buttonPause = new ThumbnailToolbarButton(Properties.Resources.PlayerPlay, "Pause/Play Music");
+            isbuttonPaused = false;
+            isMusicPlaying = false;
+            buttonNext = new ThumbnailToolbarButton(Properties.Resources.PlayerNext, "Next Music");
+
             windowInitialized = true;
-		}
+        }
 
         private bool IsVisibleOnAnyScreen(Rectangle rect)
         {
@@ -225,6 +241,11 @@ namespace WinGrooves
             this.Play = new System.Windows.Forms.ToolStripMenuItem();
             this.Like = new System.Windows.Forms.ToolStripMenuItem();
             this.Dislike = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripSeparator();
+            this.loopSongsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.shuffleToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripSeparator();
+            this.muteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.Exit = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
@@ -270,10 +291,15 @@ namespace WinGrooves
             this.Play,
             this.Like,
             this.Dislike,
+            this.toolStripMenuItem2,
+            this.loopSongsToolStripMenuItem,
+            this.shuffleToolStripMenuItem,
+            this.toolStripMenuItem3,
+            this.muteToolStripMenuItem,
             this.toolStripSeparator1,
             this.Exit});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(182, 236);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(182, 292);
             // 
             // HideShow
             // 
@@ -335,6 +361,37 @@ namespace WinGrooves
             this.Dislike.Size = new System.Drawing.Size(181, 22);
             this.Dislike.Text = "Dislike Current Song";
             this.Dislike.Click += new System.EventHandler(this.Dislike_Click);
+            // 
+            // toolStripMenuItem2
+            // 
+            this.toolStripMenuItem2.Name = "toolStripMenuItem2";
+            this.toolStripMenuItem2.Size = new System.Drawing.Size(178, 6);
+            // 
+            // loopSongsToolStripMenuItem
+            // 
+            this.loopSongsToolStripMenuItem.Name = "loopSongsToolStripMenuItem";
+            this.loopSongsToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
+            this.loopSongsToolStripMenuItem.Text = "Loop Songs";
+            this.loopSongsToolStripMenuItem.Click += new System.EventHandler(this.loopSongsToolStripMenuItem_Click);
+            // 
+            // shuffleToolStripMenuItem
+            // 
+            this.shuffleToolStripMenuItem.Name = "shuffleToolStripMenuItem";
+            this.shuffleToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
+            this.shuffleToolStripMenuItem.Text = "Shuffle";
+            this.shuffleToolStripMenuItem.Click += new System.EventHandler(this.shuffleToolStripMenuItem_Click);
+            // 
+            // toolStripMenuItem3
+            // 
+            this.toolStripMenuItem3.Name = "toolStripMenuItem3";
+            this.toolStripMenuItem3.Size = new System.Drawing.Size(178, 6);
+            // 
+            // muteToolStripMenuItem
+            // 
+            this.muteToolStripMenuItem.Name = "muteToolStripMenuItem";
+            this.muteToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
+            this.muteToolStripMenuItem.Text = "Mute";
+            this.muteToolStripMenuItem.Click += new System.EventHandler(this.muteToolStripMenuItem_Click);
             // 
             // toolStripSeparator1
             // 
@@ -411,17 +468,6 @@ namespace WinGrooves
             this.alwaysListeningTimer.Enabled = true;
             this.alwaysListeningTimer.Interval = 600000;
             this.alwaysListeningTimer.Tick += new System.EventHandler(this.alwaysListeningTimer_Tick);
-
-            //
-            // Win 7 toolbar buttons
-            //
-            this.buttonPrev = new ThumbnailToolbarButton(Properties.Resources.PlayerPrev, "Previous Music");
-            this.buttonPause = new ThumbnailToolbarButton(Properties.Resources.PlayerPlay, "Pause/Play Music");
-            this.isbuttonPaused = true;
-            this.isMusicPlaying = false;
-            this.buttonNext = new ThumbnailToolbarButton(Properties.Resources.PlayerNext, "Next Music");
-
-            
             // 
             // FrmMain
             // 
@@ -452,12 +498,13 @@ namespace WinGrooves
         [STAThread]
         static void Main()
         {
+            Application.EnableVisualStyles();
             //Check if application is aready running before running it again
             bool ok;
             object m = new System.Threading.Mutex(true, "WinGrooves", out ok);
             if (!ok)
             {
-                MessageBox.Show("WinGrooves is already running.");
+                MessageBox.Show("WinGrooves is already running.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
             Application.Run(new FrmMain());
@@ -491,15 +538,14 @@ namespace WinGrooves
                 buttonPrev.Click += new EventHandler<ThumbnailButtonClickedEventArgs>(Previous_Click);
                 buttonPause.Click += new EventHandler<ThumbnailButtonClickedEventArgs>(Play_Click);
                 buttonNext.Click += new EventHandler<ThumbnailButtonClickedEventArgs>(Next_Click);
-                
+
                 //Add the buttons (kinda of ugly tough)
-                ThumbnailToolbarButton[] buttonList = new ThumbnailToolbarButton[3];
-                buttonList[0] = buttonPrev; buttonList[1] = buttonPause; buttonList[2] = buttonNext;
+                ThumbnailToolbarButton[] buttonList = new ThumbnailToolbarButton[3] { buttonPrev, buttonPause, buttonNext };
                 TaskbarManager.Instance.ThumbnailToolbars.AddButtons(this.Handle, buttonList);
-                
+
             }
         }
-        
+
         /*
          * Simulates a browser click on an html element
          /// <param name="action">the HTML id of the element to click on/param>
@@ -579,11 +625,25 @@ namespace WinGrooves
             if (TaskbarManager.IsPlatformSupported)
             {
                 //this only shortens the delay of the button change. Need to have a disabled state!
-                if (isbuttonPaused) { buttonPause.Icon = Properties.Resources.PlayerPause; isbuttonPaused = false;}
-                if (!isbuttonPaused) { buttonPause.Icon = Properties.Resources.PlayerPlay; isbuttonPaused = true;}
+                if (!isbuttonPaused)
+                {
+                    buttonPause.Icon = Properties.Resources.PlayerPause;
+                    isbuttonPaused = true;
+                    playerExecute("play-pause");
+                    isMusicPlaying = true;
+                    return;
+                }
+                if (isbuttonPaused)
+                {
+                    buttonPause.Icon = Properties.Resources.PlayerPlay;
+                    isbuttonPaused = false;
+                    playerExecute("play-pause");
+                    isMusicPlaying = false;
+                    return;
+                }
             }
-          
-            playerExecute("play-pause");
+            else
+                playerExecute("play-pause");
         }
 
         private void Next_Click(object sender, EventArgs e)
@@ -647,15 +707,15 @@ namespace WinGrooves
             uint KeyAsInt = (uint)(e.Key | hook.keyToModifierKey(e.Modifier));
             if (KeyAsInt == Properties.Settings.Default.hotkeyPlay)
             {
-				htmlClickOn("#play-pause");
+                htmlClickOn("#play-pause");
             }
             else if (KeyAsInt == Properties.Settings.Default.hotkeyNext)
             {
-				htmlClickOn("#play-next");
+                htmlClickOn("#play-next");
             }
             else if (KeyAsInt == Properties.Settings.Default.hotkeyPrevious)
             {
-				htmlClickOn("#play-prev");
+                htmlClickOn("#play-prev");
             }
             else if (KeyAsInt == Properties.Settings.Default.hotkeyLike)
             {
@@ -671,7 +731,7 @@ namespace WinGrooves
             }
             else if (KeyAsInt == Properties.Settings.Default.hotkeyMute)
             {
-				htmlClickOn("#volume");
+                htmlClickOn("#volume");
             }
             else if (KeyAsInt == Properties.Settings.Default.hotkeyShowHide)
             {
@@ -679,7 +739,7 @@ namespace WinGrooves
             }
             else if (KeyAsInt == Properties.Settings.Default.hotkeyShuffle)
             {
-				htmlClickOn("#shuffle");
+                htmlClickOn("#shuffle");
             }
         }
 
@@ -723,10 +783,13 @@ namespace WinGrooves
                         HtmlElement scriptEl = webBrowser1.Document.CreateElement("script");
                         IHTMLScriptElement element = (IHTMLScriptElement)scriptEl.DomElement;
                         string injectedJquery = "function getSongTitle() {  return $(\"#now-playing-metadata .song\").text(); } " +
-                            "function getSongArtist() {  return $(\"#now-playing-metadata .artist\").text(); }" + 
+                            "function getSongArtist() {  return $(\"#now-playing-metadata .artist\").text(); }" +
                             "function mouseMove() {  $(\"#page-wrapper\").mousemove(); }" +
                             "function clickElement(selector) {  $(selector).click(); }" +
-                            "function getMusicState() {return $(\"#play-pause\").hasClass(\"paused\"); }"
+                            "function getMusicState() {return $(\"#play-pause\").hasClass(\"play\"); }" +
+                            "function getShuffleActive() { return $(\"#shuffle\").hasClass(\"active\"); }" +
+                            "function getRepeatActive() { return $(\"#repeat\").hasClass(\"active\") || $(\"#repeat\").hasClass(\"one\"); }" +
+                            "function getMuteActive() { return $(\"#volume\").hasClass(\"mute\"); }"
                         ;
                         element.text = injectedJquery;
                         head.AppendChild(scriptEl);
@@ -735,11 +798,10 @@ namespace WinGrooves
                     }
 
                     object songTitle = webBrowser1.Document.InvokeScript("getSongTitle");
-
                     //Since the song title changed we must update all the information
                     if (String.IsNullOrEmpty(_cachedSongTitle) || _cachedSongTitle != songTitle.ToString())
                     {
-                        
+
                         //cache new song title so we can tell if it changes again
                         _cachedSongTitle = songTitle.ToString();
 
@@ -751,7 +813,7 @@ namespace WinGrooves
 
                         if (songTitle.ToString().Length > 0)
                         {
-                            this.Text = songTitle + " - " + songArtist + " - WinGrooves";
+                            this.Text = songTitle + " - " + songArtist + " - " + Application.ProductName;
                             //set the tray icon text if it is less than 63 characters (the max allowed)
                             if ((songTitle.ToString().Length + songArtist.ToString().Length + 3) < 63)
                             {
@@ -765,7 +827,7 @@ namespace WinGrooves
                                 }
                                 catch
                                 {
-                                    notifyIcon1.Text = ("WinGrooves");
+                                    notifyIcon1.Text = Application.ProductName;
                                 }
                             }
                         }
@@ -775,17 +837,26 @@ namespace WinGrooves
                         {
                             //the element class of the play button on grooveshark changes according to the music state (contains play/paused/nothing)
                             //I can't figure a better way to control the thumbnail states.
-                            if (Convert.ToBoolean(webBrowser1.Document.InvokeScript("getMusicState")))
-                            {
-                                buttonPause.Icon = Properties.Resources.PlayerPause;
-                                isbuttonPaused = false;
-                            }
-                            else
-                            {
-                                buttonPause.Icon = Properties.Resources.PlayerPlay;
-                                isbuttonPaused = true;
-                            }
+                            if (isMusicPlaying)
+                                if (!Convert.ToBoolean(webBrowser1.Document.InvokeScript("getMusicState")))
+                                {
+                                    buttonPause.Icon = Properties.Resources.PlayerPause;
+                                    isbuttonPaused = true;
+                                }
+                                else
+                                {
+                                    buttonPause.Icon = Properties.Resources.PlayerPlay;
+                                    isbuttonPaused = false;
+                                }
                         }
+                        if (Settings.Default.showBalloonNotification && !Convert.ToBoolean(webBrowser1.Document.InvokeScript("getMusicState")) && notifyIcon1.Text != Application.ProductName)
+                        {
+                            notifyIcon1.ShowBalloonTip(Convert.ToInt32(Settings.Default.numBalloonDelay) * 1000, Application.ProductName,
+                                String.Format("Now playing \"{0}\"", notifyIcon1.Text), ToolTipIcon.Info);
+                        }
+                        shuffleToolStripMenuItem.Checked = Convert.ToBoolean(webBrowser1.Document.InvokeScript("getShuffleActive"));
+                        loopSongsToolStripMenuItem.Checked = Convert.ToBoolean(webBrowser1.Document.InvokeScript("getRepeatActive"));
+                        muteToolStripMenuItem.Checked = Convert.ToBoolean(webBrowser1.Document.InvokeScript("getMuteActive"));
                     }
                 }
                 catch (NullReferenceException)
@@ -810,6 +881,18 @@ namespace WinGrooves
         private void webBrowser1_DocumentCompleted(object sender, WebBrowserDocumentCompletedEventArgs e)
         {
             currentSongTimer.Enabled = true;
+            mshtml.HTMLDocumentEvents2_Event htmlEvent;
+            htmlEvent = (mshtml.HTMLDocumentEvents2_Event)(mshtml.HTMLDocument)webBrowser1.Document.DomDocument;
+            htmlEvent.onclick += new HTMLDocumentEvents2_onclickEventHandler(htmlEvent_onclick);
+        }
+
+        bool htmlEvent_onclick(IHTMLEventObj pEvtObj)
+        {
+            if (pEvtObj.srcElement.className == "icon play icon-play-white-outline")
+            {
+                isMusicPlaying = true;
+            }
+            return true;
         }
 
         private void alwaysListeningTimer_Tick(object sender, EventArgs e)
@@ -857,7 +940,7 @@ namespace WinGrooves
         /// </summary>
         private void UpdateThumbnail()
         {
-          
+
             var url = webBrowser1.Document.GetElementById("now-playing-image").GetAttribute("src");
 
             if (String.IsNullOrEmpty(url) || url.EndsWith("40_album.png"))
@@ -882,6 +965,24 @@ namespace WinGrooves
             }
         }
         #endregion
+
+        private void shuffleToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            htmlClickOn("#shuffle");
+            shuffleToolStripMenuItem.Checked = !shuffleToolStripMenuItem.Checked;
+        }
+
+        private void loopSongsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            htmlClickOn("#repeat");
+            loopSongsToolStripMenuItem.Checked = !loopSongsToolStripMenuItem.Checked;
+        }
+
+        private void muteToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            htmlClickOn("#volume");
+            muteToolStripMenuItem.Checked = !muteToolStripMenuItem.Checked;
+        }
 
     }
 }
