@@ -17,14 +17,25 @@ namespace WinGrooves.Utils
             {
                 return null;
             }
-            var request = WebRequest.Create(url);
 
-            using (var response = request.GetResponse())
-            using (var stream = response.GetResponseStream())
+            try
             {
-                if (stream == null) return null;
-                return (Bitmap)Image.FromStream(stream);
+                var request = WebRequest.Create(url);
+
+                using (var response = request.GetResponse())
+                using (var stream = response.GetResponseStream())
+                {
+                    if (stream == null) return null;
+                    return (Bitmap) Image.FromStream(stream);
+                }
             }
+            catch
+            {
+                //If something goes wrong downloading the Album art
+                //Don't worry about it. This is just a nice to have.
+                return null;
+            }
+          
         }
 
         /// <summary>
