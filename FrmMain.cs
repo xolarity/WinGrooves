@@ -945,8 +945,8 @@ namespace WinGrooves
 
             if (String.IsNullOrEmpty(url) || url.EndsWith("40_album.png"))
             {
-                //there is no album art for this song so lets just redraw the application.
-                _customThumbnail.SetImage(ImageUtils.ApplicationThumbnail(this));
+                //there is no album art for this song so lets invalidate the preview.
+                _customThumbnail.InvalidatePreview();
             }
             else
             {
@@ -960,8 +960,7 @@ namespace WinGrooves
                     fileName = String.Format("120{0}", fileName.Substring(fileName.IndexOf("_")));
                     url = urlBase + fileName;
                 }
-                Bitmap albumPreview = ImageUtils.BitmapFromUrl(url);
-                _customThumbnail.SetImage(albumPreview ?? ImageUtils.ApplicationThumbnail(this));
+                _customThumbnail.SetImage(ImageUtils.BitmapFromUrl(url));
             }
         }
         #endregion

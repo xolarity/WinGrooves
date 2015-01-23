@@ -37,20 +37,5 @@ namespace WinGrooves.Utils
             }
           
         }
-
-        /// <summary>
-        /// Returns a bitmap of the current form.
-        /// </summary>
-        /// <returns>Returns a bitmap of the current form</returns>
-        public static Bitmap ApplicationThumbnail(System.Windows.Forms.Form form)
-        {
-            Graphics myGraphics = form.CreateGraphics();
-            Size s = form.Size;
-            Bitmap memoryImage = new Bitmap(s.Width, s.Height, myGraphics);
-            Graphics memoryGraphics = Graphics.FromImage(memoryImage);
-            memoryGraphics.CopyFromScreen(form.Location.X, form.Location.Y, 0, 0, s);
-            return memoryImage;
-        }
-
     }
 }
